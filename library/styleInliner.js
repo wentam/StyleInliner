@@ -37,15 +37,16 @@ var styleInliner;
   // Return value:
   // the element with inlined styles (same object as target)
   styleInliner.prototype.inlineStylesForSingleElement = function(element, target, excludeStyles) {
+    if (excludeStyles == null) {excludeStyles = {}}
+
     var computedStyle = getComputedStyle(element);
     var defaultStyle = computeDefaultStyleByTagName(element.tagName);
     for (var i = 0; i < computedStyle.length; i++) {
       var styleName = computedStyle[i];
 
       // exclude user-excluded styles
-      if (excludeStyles == null ||
-        excludeStyles[styleName.toUpperCase()] == null ||
-        excludeStyles[styleName.toUpperCase()] != true) {
+      if (excludeStyles[styleName.toUpperCase()] == null ||
+          excludeStyles[styleName.toUpperCase()] != true) {
           // exclude default styles
           if (defaultStyle[styleName] !== computedStyle[styleName]) {
             target.style[styleName] = computedStyle[styleName];
@@ -62,14 +63,22 @@ var styleInliner;
   //   Valid flags:
   //     makeCopy (Default false): If true, will create a copy with inlined styles rather than inlining directly into the object passed.
   //     useParentElement (Default true): If true, will inline the styles for the top-level element and it's children. If false, will only do children.
-  //     excludeTags: A map of tags to ignore when inlining styles. Format: {"tag1":true,"tag2":true}
-  //     excludeElements: A map of specific elements to ignore when inlining styles. Format: {elem1:true,elem2:true}
+  //     TODO excludeTags: A map of tags to ignore when inlining styles. Format: {"tag1":true,"tag2":true}
+  //     TODO excludeElements: A map of specific elements to ignore when inlining styles. Format: {elem1:true,elem2:true}
   //     excludeStyles: A map of styles to ignore. Format: {"STYLE1":true,"STYLE2":true}. Must be uppercase.
   //
   // Return value:
   // the doc with inlined styles.
   styleInliner.prototype.inlineStyles = function(element, flags) {
     var me = this;
+
+    // explicitly define all flags
+    if (flags == null) {flags = {};}
+    if (flags.makeCopy == null) {flags.makeCopy = false;}
+    if (flags.useParentElement == null) {flags.useParentElement = true;}
+    if (flags.excludeTags == null) {flags.excludeTags = {};}
+    if (flags.excludeElements == null) {flags.excludeElements = {};}
+    if (flags.excludeStyles == null) {flags.excludeStyles = {};}
 
     if (element.nodeType !== Node.ELEMENT_NODE) {
       throw new TypeError("Invalid element passed");
@@ -84,7 +93,7 @@ var styleInliner;
     }
 
     // inline parent element?
-    if (flags && flags.useParentElement != false) {
+    if (flags && flags.useParentElement == true) {
       me.inlineStylesForSingleElement(element,targetElement, flags.excludeStyles);
     }
 
@@ -92,7 +101,7 @@ var styleInliner;
     var childElements = element.children;
     var targetChildElements = targetElement.children;
     for (var i = 0; i < childElements.length; i++) {
-      me.inlineStylesForSingleElement(childElements[i],targetChildElements[i], flags ? flags.excludeStyles : null);
+      me.inlineStylesForSingleElement(childElements[i],targetChildElements[i], flags.excludeStyles);
     }
     return targetElement;
   }
