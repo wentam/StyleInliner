@@ -2,7 +2,8 @@ var styleInliner;
 
 (function(){
 
-  // -- internal
+  // internal stuff
+  var defaultStyle = {};
   var computeDefaultStyleByTagName = function(tagName) {
     var defaultStyle = {};
     var element = document.body.appendChild(document.createElement(tagName));
@@ -23,8 +24,22 @@ var styleInliner;
   //
   // Return value:
   // A new styleInliner object
-  styleInliner = function() {
+  
+  var precomputeTags =
+  ["A","ABBR","ADDRESS","AREA","ARTICLE","ASIDE","AUDIO","B","BASE","BDI","BDO","BLOCKQUOTE","BODY",
+  "BR","BUTTON","CANVAS","CAPTION","CENTER","CITE","CODE","COL","COLGROUP","COMMAND","DATALIST",
+  "DD","DEL","DETAILS","DFN","DIV","DL","DT","EM","EMBED","FIELDSET","FIGCAPTION","FIGURE","FONT",
+  "FOOTER","FORM","H1","H2","H3","H4","H5","H6","HEAD","HEADER","HGROUP","HR","HTML","I","IFRAME",
+  "IMG","INPUT","INS","KBD","KEYGEN","LABEL","LEGEND","LI","LINK","MAP","MARK","MATH","MENU","META",
+  "METER","NAV","NOBR","NOSCRIPT","OBJECT","OL","OPTION","OPTGROUP","OUTPUT","P","PARAM","PRE",
+  "PROGRESS","Q","RP","RT","RUBY","S","SAMP","SCRIPT","SECTION","SELECT","SMALL","SOURCE","SPAN",
+  "STRONG","STYLE","SUB","SUMMARY","SUP","SVG","TABLE","TBODY","TD","TEXTAREA","TFOOT","TH","THEAD",
+  "TIME","TITLE","TR","TRACK","U","UL","VAR","VIDEO","WBR"];
 
+  styleInliner = function() {
+    for (var i = 0; i < precomputeTags.length; i++) {
+      defaultStyle[precomputeTags[i]] = computeDefaultStyleByTagName(precomputeTags[i]);
+    }
   }
 
   // inlineStylesForSingleElement(element, target): inlines the styles for a single element, and not it's children
@@ -40,7 +55,9 @@ var styleInliner;
     if (excludeStyles == null) {excludeStyles = {}}
 
     var computedStyle = getComputedStyle(element);
-    var defaultStyle = computeDefaultStyleByTagName(element.tagName);
+    if (defaultStyle[element.tagName] == null) {
+      defaultStyle[element.tagName] = computeDefaultStyleByTagName(element.tagName);
+    }
     for (var i = 0; i < computedStyle.length; i++) {
       var styleName = computedStyle[i];
 
@@ -48,7 +65,7 @@ var styleInliner;
       if (excludeStyles[styleName.toUpperCase()] == null ||
           excludeStyles[styleName.toUpperCase()] != true) {
           // exclude default styles
-          if (defaultStyle[styleName] !== computedStyle[styleName]) {
+          if (defaultStyle[element.tagName][styleName] !== computedStyle[styleName]) {
             target.style[styleName] = computedStyle[styleName];
           }
         }
