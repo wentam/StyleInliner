@@ -1,7 +1,6 @@
 var styleInliner;
 
 (function(){
-
   // internal stuff
   var defaultStyle = {};
   var computeDefaultStyleByTagName = function(tagName) {
@@ -15,8 +14,6 @@ var styleInliner;
     return defaultStyle;
   }
 
-
-
   // new styleInliner(): initializes the inliner. A fair bit of work is done here so it's best to only create the object once.
   //
   // Params:
@@ -24,7 +21,7 @@ var styleInliner;
   //
   // Return value:
   // A new styleInliner object
-  
+
   var precomputeTags =
   ["A","ABBR","ADDRESS","AREA","ARTICLE","ASIDE","AUDIO","B","BASE","BDI","BDO","BLOCKQUOTE","BODY",
   "BR","BUTTON","CANVAS","CAPTION","CENTER","CITE","CODE","COL","COLGROUP","COMMAND","DATALIST",
@@ -145,5 +142,4 @@ var styleInliner;
     }
     return targetElement;
   }
-
 }());
