@@ -5,11 +5,17 @@ var styleInliner;
   var defaultStyle = {};
   var computeDefaultStyleByTagName = function(tagName) {
     var defaultStyle = {};
-    var element = document.body.appendChild(document.createElement(tagName));
-    var computedStyle = getComputedStyle(element);
-    for (var i = 0; i < computedStyle.length; i++) {
-      defaultStyle[computedStyle[i]] = computedStyle[computedStyle[i]];
+    var element = document.createElement(tagName);
+
+    var computedStyleAttached = getComputedStyle(document.body.appendChild(element));
+    var display = computedStyleAttached.getPropertyValue('display');
+    element.style.display = "none";
+    for (var i = 0; i < computedStyleAttached.length; i++) {
+      defaultStyle[computedStyleAttached[i]] = computedStyleAttached[computedStyleAttached[i]];
     }
+
+    defaultStyle['display'] = display;
+
     document.body.removeChild(element);
     return defaultStyle;
   }
@@ -55,8 +61,10 @@ var styleInliner;
   // the element with inlined styles (same object as target)
   styleInliner.prototype.inlineStylesForSingleElement = function(element, target, excludeStyles) {
     if (excludeStyles == null) {excludeStyles = {}}
-
     var computedStyle = getComputedStyle(element);
+    var display = computedStyle.getPropertyValue("display");
+    var returnDisplay = element.style.display;
+    element.style.display = "none";
     if (defaultStyle[element.tagName] == null) {
       defaultStyle[element.tagName] = computeDefaultStyleByTagName(element.tagName);
     }
@@ -70,8 +78,16 @@ var styleInliner;
           if (defaultStyle[element.tagName][styleName] !== computedStyle[styleName]) {
             target.style[styleName] = computedStyle[styleName];
           }
+
+          if (styleName == "display" && defaultStyle[element.tagName]['display'] !== display) {
+            target.style['display'] = display;
+          } else if (styleName == "display") {
+            target.style['display'] = "";
+          }
         }
       }
+
+      element.style.display = returnDisplay;
     }
 
   // inlineStyles(element, makeCopy): inlines all styles applied to elements in doc
