@@ -64,11 +64,12 @@ var styleInliner;
   //     makeCopy (Default false): If true, will create a copy with inlined styles rather than inlining directly into the object passed.
   //     useParentElement (Default true): If true, will inline the styles for the top-level element and it's children. If false, will only do children.
   //     TODO excludeTags: A map of tags to ignore when inlining styles. Format: {"tag1":true,"tag2":true}
-  //     TODO excludeElements: A map of specific elements to ignore when inlining styles. Format: {elem1:true,elem2:true}
+  //     excludeClasses: A map of specific classes whose elements will be ignored when inlining styles. Format: {"class1":true,"class2":true}
+  //     excludeIds: A map of specific ids whose elements will be ignored when inlining styles. Format: {"id1":true,"id1":true}
   //     excludeStyles: A map of styles to ignore. Format: {"STYLE1":true,"STYLE2":true}. Must be uppercase.
   //
   // Return value:
-  // the doc with inlined styles.
+  // The element with inlined styles. Will be a copy of the input element if makeCopy is true;
   styleInliner.prototype.inlineStyles = function(element, flags) {
     var me = this;
 
@@ -77,11 +78,30 @@ var styleInliner;
     if (flags.makeCopy == null) {flags.makeCopy = false;}
     if (flags.useParentElement == null) {flags.useParentElement = true;}
     if (flags.excludeTags == null) {flags.excludeTags = {};}
-    if (flags.excludeElements == null) {flags.excludeElements = {};}
+    if (flags.excludeClasses == null) {flags.excludeClasses = {};}
+    if (flags.excludeIds == null) {flags.excludeIds = {};}
     if (flags.excludeStyles == null) {flags.excludeStyles = {};}
 
+    // Throw errors on parameter combinations that would otherwise lead to undefined behavior
     if (element.nodeType !== Node.ELEMENT_NODE) {
       throw new TypeError("Invalid element passed");
+      return;
+    }
+
+    for (var i = 0; i < element.classList.length; i++) {
+      if (flags.excludeClasses[element.classList[i]] == true && flags.useParentElement == true) {
+        throw "You've asked styleInliner.inlineStyles() to exclude the parent element with "+
+        "flags.excludeClasses, but also to include the parent element with "+
+        "flags.useParentElement = true. These are in conflict with each other.";
+        return;
+      }
+    }
+
+    if (flags.excludeIds[element.id] == true && flags.useParentElement == true) {
+      throw "You've asked styleInliner.inlineStyles() to exclude the parent element with "+
+            "flags.excludeIds, but also to include the parent element with "+
+            "flags.useParentElement = true. These are in conflict with each other.";
+      return;
     }
 
     // figure out where we're putting our styles
@@ -94,14 +114,28 @@ var styleInliner;
 
     // inline parent element?
     if (flags && flags.useParentElement == true) {
-      me.inlineStylesForSingleElement(element,targetElement, flags.excludeStyles);
+      me.inlineStylesForSingleElement(element, targetElement, flags.excludeStyles);
     }
 
     // inline child elements
     var childElements = element.children;
     var targetChildElements = targetElement.children;
     for (var i = 0; i < childElements.length; i++) {
-      me.inlineStylesForSingleElement(childElements[i],targetChildElements[i], flags.excludeStyles);
+      // is this element excluded by the function caller?
+      var excludeThisElement = false;
+      for (var i2 = 0; i2 < childElements[i].classList.length; i2++) {
+        if (flags.excludeClasses[childElements[i].classList[i2]] == true) {
+          excludeThisElement = true;
+        }
+      }
+
+      if (flags.excludeIds[childElements[i].id] == true) {
+        excludeThisElement = true;
+      }
+
+      if (!excludeThisElement) {
+        me.inlineStylesForSingleElement(childElements[i], targetChildElements[i], flags.excludeStyles);
+      }
     }
     return targetElement;
   }
