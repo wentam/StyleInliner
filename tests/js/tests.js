@@ -11,15 +11,16 @@ var tags =
 "TIME","TITLE","TR","TRACK","U","UL","VAR","VIDEO","WBR"];
 
 function compareComputedStyles(com1,com2,displayOverride) {
-    if (com1.length == com2.length) {
+  console.log(com1.length);
+  console.log(com2.length);
+  if (com1.length == com2.length) {
     for(var i = 0; i < com1.length; i++)  {
       var styleName = com1[i];
       if (com1[styleName] != com2[styleName]) {
-        if (displayOverride && styleName == 'display') {
-          if (displayOverride != com2[styleName]) {
-            return false;
-          }
-        } else {
+        if (styleName != 'display') {
+          console.log("false in loop");
+          console.log(styleName);
+          console.log(com1[styleName]+"vs"+com2[styleName]);
           return false;
         }
       }
@@ -27,6 +28,7 @@ function compareComputedStyles(com1,com2,displayOverride) {
   } else {
     return false;
   }
+
 
   return true;
 }
@@ -69,14 +71,17 @@ window.addEventListener("load", function(){
   QUnit.test("inlineStylesForSingleElement(): computed style should be indentical for the new element", function(assert) {
     var sourceElem = document.getElementById('computed_test');
     var newElem = sourceElem.cloneNode(true);
+    document.body.appendChild(newElem);
     styleInliner.inlineStylesForSingleElement(sourceElem, newElem);
 
     var sourceComp = getComputedStyle(sourceElem);
     var newComp = getComputedStyle(newElem);
     var oldDisplay = sourceComp.getPropertyValue('display');
     sourceElem.style.display = "none";
+    newElem.style.display = "none";
     var computedStylesIdentical = compareComputedStyles(sourceComp,newComp,oldDisplay);
 
+    document.body.removeChild(newElem);
     assert.ok(computedStylesIdentical, "computed styles indentical");
   });
 });
