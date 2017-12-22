@@ -34,6 +34,11 @@ var styleInliner;
   "TIME","TITLE","TR","TRACK","U","UL","VAR","VIDEO","WBR"];
 
   styleInliner = function() {
+    if (document.body == null) {
+      throw "document.body must exist before creating styleInliner";
+      return;
+    }
+
     for (var i = 0; i < precomputeTags.length; i++) {
       defaultStyle[precomputeTags[i]] = computeDefaultStyleByTagName(precomputeTags[i]);
     }
