@@ -11,16 +11,11 @@ var tags =
 "TIME","TITLE","TR","TRACK","U","UL","VAR","VIDEO","WBR"];
 
 function compareComputedStyles(com1,com2,displayOverride) {
-  console.log(com1.length);
-  console.log(com2.length);
   if (com1.length == com2.length) {
     for(var i = 0; i < com1.length; i++)  {
       var styleName = com1[i];
       if (com1[styleName] != com2[styleName]) {
         if (styleName != 'display') {
-          console.log("false in loop");
-          console.log(styleName);
-          console.log(com1[styleName]+"vs"+com2[styleName]);
           return false;
         }
       }
