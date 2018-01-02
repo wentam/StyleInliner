@@ -236,7 +236,7 @@ window.addEventListener("load", function(){
     document.body.appendChild(newElems);
     var img = newElems.getElementsByTagName('DIV')[0].getElementsByTagName('IMG')[0];
 
-    assert.ok(img.style.width != "100px", "styles should not be inlined for class");
+    assert.ok(img.style.width != "100px", "");
     document.body.removeChild(newElems);
 
     freeTestStructure(sourceElems);
@@ -248,7 +248,7 @@ window.addEventListener("load", function(){
     document.body.appendChild(newElems);
     var img = newElems.getElementsByTagName('DIV')[0].getElementsByTagName('IMG')[0];
 
-    assert.ok(img.style.width != "100px", "styles should not be inlined for class");
+    assert.ok(img.style.width != "100px", "");
     document.body.removeChild(newElems);
 
     freeTestStructure(sourceElems);
