@@ -2,3 +2,16 @@
   border-radius: 1px 2px 3px 4px;
   background: url(images/null.png) no-repeat left top;
 }
+
+#test_structure {
+  padding-left:50px;
+}
+
+#test_structure_subdiv {
+  padding-left:10px;
+}
+
+.testimg {
+  width: 100px;
+  height: 100px;
+}

@@ -20,6 +20,38 @@ var styleInliner;
     return defaultStyle;
   }
 
+  recursivelyInline = function(inliner, sourceElement, targetElement, flags) {
+    if (flags.recursion == null) {flags.recursion = false}
+
+    // is this element excluded by user args?
+    var excludeThisElement = false;
+
+    for (var i2 = 0; i2 < sourceElement.classList.length; i2++) {
+      if (flags.excludeClasses[sourceElement.classList[i2]] == true) {
+        excludeThisElement = true;
+      }
+    }
+
+    if (flags.excludeIds[sourceElement.id] == true) {excludeThisElement = true;}
+    if (flags.excludeTags[sourceElement.tagName] == true) {excludeThisElement = true;}
+    if (flags.useParentElement == false && flags.recursion == false) {excludeThisElement = true;}
+
+    // inline the passed element
+    if (!excludeThisElement) {
+      inliner.inlineStylesForSingleElement(sourceElement, targetElement, flags.excludeStyles);
+    }
+
+    // inline child elements
+    var childElements = sourceElement.children;
+    var targetChildElements = targetElement.children;
+    for (var i = 0; i < childElements.length; i++) {
+      flags.recursion = true;
+      recursivelyInline(inliner, childElements[i],targetChildElements[i], flags);
+    }
+
+    return targetElement;
+  }
+
   // new styleInliner(): initializes the inliner. A fair bit of work is done here so it's best to only create the object once.
   //
   // Params:
@@ -72,8 +104,8 @@ var styleInliner;
       var styleName = computedStyle[i];
 
       // exclude user-excluded styles
-      if (excludeStyles[styleName.toUpperCase()] == null ||
-          excludeStyles[styleName.toUpperCase()] != true) {
+      if (excludeStyles[styleName] == null ||
+          excludeStyles[styleName] != true) {
           // exclude default styles
           if (defaultStyle[element.tagName][styleName] !== computedStyle[styleName]) {
             target.style[styleName] = computedStyle[styleName];
@@ -108,7 +140,6 @@ var styleInliner;
   styleInliner.prototype.inlineStyles = function(element, flags) {
     var me = this;
 
-    // explicitly define all flags
     if (flags == null) {flags = {};}
     if (flags.makeCopy == null) {flags.makeCopy = false;}
     if (flags.useParentElement == null) {flags.useParentElement = true;}
@@ -131,36 +162,6 @@ var styleInliner;
       targetElement = element;
     }
 
-    // inline parent element?
-    if (flags.useParentElement == true) {
-      me.inlineStylesForSingleElement(element, targetElement, flags.excludeStyles);
-    }
-
-    // inline child elements
-    var childElements = element.children;
-    var targetChildElements = targetElement.children;
-    for (var i = 0; i < childElements.length; i++) {
-      // is this element excluded by the function caller?
-      var excludeThisElement = false;
-      for (var i2 = 0; i2 < childElements[i].classList.length; i2++) {
-        if (flags.excludeClasses[childElements[i].classList[i2]] == true) {
-          excludeThisElement = true;
-        }
-      }
-
-      if (flags.excludeIds[childElements[i].id] == true) {
-        excludeThisElement = true;
-      }
-
-      if (flags.excludeTags[childElements[i].tagName] == true) {
-        excludeThisElement = true;
-      }
-
-      if (!excludeThisElement) {
-        // inline styles for this element
-        me.inlineStylesForSingleElement(childElements[i], targetChildElements[i], flags.excludeStyles);
-      }
-    }
-    return targetElement;
+    return recursivelyInline(me, element, targetElement, flags);
   }
 }());
