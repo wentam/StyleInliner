@@ -2,14 +2,14 @@ module.exports = function(grunt) {
   grunt.initConfig({
     concat: {
       build: {
-        src: ['library/styleInliner.js'],
-        dest: 'build/styleInliner.js'
+        src: ['library/StyleInliner.js'],
+        dest: 'build/StyleInliner.js'
       }
     },
     uglify: {
       build: {
         files: {
-          'build/styleInliner.min.js' : ['build/styleInliner.js'],
+          'build/StyleInliner.min.js' : ['build/StyleInliner.js'],
         }
       }
     }

@@ -76,7 +76,7 @@ function freeTestStructure(elems) {
 }
 
 window.addEventListener("load", function(){
-  styleInliner = new styleInliner();
+  styleInliner = new StyleInliner();
 
   QUnit.test("inlineStylesForSingleElement(): Element should have it's styles inlined", function(assert) {
     var sourceElem = prepTestStructure();

@@ -1,4 +1,4 @@
-var styleInliner;
+var StyleInliner;
 
 (function(){
   // internal stuff
@@ -52,13 +52,13 @@ var styleInliner;
     return targetElement;
   }
 
-  // new styleInliner(): initializes the inliner. A fair bit of work is done here so it's best to only create the object once.
+  // new StyleInliner(): initializes the inliner. A fair bit of work is done here so it's best to only create the object once.
   //
   // Params:
   // <none>
   //
   // Return value:
-  // A new styleInliner object
+  // A new StyleInliner object
 
   var precomputeTags =
   ["A","ABBR","ADDRESS","AREA","ARTICLE","ASIDE","AUDIO","B","BASE","BDI","BDO","BLOCKQUOTE","BODY",
@@ -71,9 +71,9 @@ var styleInliner;
   "STRONG","STYLE","SUB","SUMMARY","SUP","SVG","TABLE","TBODY","TD","TEXTAREA","TFOOT","TH","THEAD",
   "TIME","TITLE","TR","TRACK","U","UL","VAR","VIDEO","WBR"];
 
-  styleInliner = function() {
+  StyleInliner = function() {
     if (document.body == null) {
-      throw "document.body must exist before creating styleInliner";
+      throw "document.body must exist before creating StyleInliner";
       return;
     }
 
@@ -91,7 +91,7 @@ var styleInliner;
   //
   // Return value:
   // the element with inlined styles (same object as target)
-  styleInliner.prototype.inlineStylesForSingleElement = function(element, target, excludeStyles) {
+  StyleInliner.prototype.inlineStylesForSingleElement = function(element, target, excludeStyles) {
     if (excludeStyles == null) {excludeStyles = {}}
     var computedStyle = getComputedStyle(element);
     var display = computedStyle.getPropertyValue("display");
@@ -137,7 +137,7 @@ var styleInliner;
   //
   // Return value:
   // The element with inlined styles. Will be a copy of the input element if makeCopy is true;
-  styleInliner.prototype.inlineStyles = function(element, flags) {
+  StyleInliner.prototype.inlineStyles = function(element, flags) {
     var me = this;
 
     if (flags == null) {flags = {};}
