@@ -1,6 +1,6 @@
 var StyleInliner;
 
-(function(){
+(function() {
   // internal stuff
   var defaultStyle = {};
   var computeDefaultStyleByTagName = function(tagName) {
@@ -21,7 +21,7 @@ var StyleInliner;
   }
 
   recursivelyInline = function(inliner, sourceElement, targetElement, flags) {
-    if (flags.recursion == null) {flags.recursion = false}
+    if (flags.recursion == null) { flags.recursion = false }
 
     // is this element excluded by user args?
     var excludeThisElement = false;
@@ -32,9 +32,9 @@ var StyleInliner;
       }
     }
 
-    if (flags.excludeIds[sourceElement.id] == true) {excludeThisElement = true;}
-    if (flags.excludeTags[sourceElement.tagName] == true) {excludeThisElement = true;}
-    if (flags.useParentElement == false && flags.recursion == false) {excludeThisElement = true;}
+    if (flags.excludeIds[sourceElement.id] == true) { excludeThisElement = true; }
+    if (flags.excludeTags[sourceElement.tagName] == true) { excludeThisElement = true; }
+    if (flags.useParentElement == false && flags.recursion == false) { excludeThisElement = true; }
 
     // inline the passed element
     if (!excludeThisElement) {
@@ -46,7 +46,7 @@ var StyleInliner;
     var targetChildElements = targetElement.children;
     for (var i = 0; i < childElements.length; i++) {
       flags.recursion = true;
-      recursivelyInline(inliner, childElements[i],targetChildElements[i], flags);
+      recursivelyInline(inliner, childElements[i], targetChildElements[i], flags);
     }
 
     return targetElement;
@@ -60,16 +60,16 @@ var StyleInliner;
   // Return value:
   // A new StyleInliner object
 
-  var precomputeTags =
-  ["A","ABBR","ADDRESS","AREA","ARTICLE","ASIDE","AUDIO","B","BASE","BDI","BDO","BLOCKQUOTE","BODY",
-  "BR","BUTTON","CANVAS","CAPTION","CENTER","CITE","CODE","COL","COLGROUP","COMMAND","DATALIST",
-  "DD","DEL","DETAILS","DFN","DIV","DL","DT","EM","EMBED","FIELDSET","FIGCAPTION","FIGURE","FONT",
-  "FOOTER","FORM","H1","H2","H3","H4","H5","H6","HEAD","HEADER","HGROUP","HR","HTML","I","IFRAME",
-  "IMG","INPUT","INS","KBD","KEYGEN","LABEL","LEGEND","LI","LINK","MAP","MARK","MATH","MENU","META",
-  "METER","NAV","NOBR","NOSCRIPT","OBJECT","OL","OPTION","OPTGROUP","OUTPUT","P","PARAM","PRE",
-  "PROGRESS","Q","RP","RT","RUBY","S","SAMP","SCRIPT","SECTION","SELECT","SMALL","SOURCE","SPAN",
-  "STRONG","STYLE","SUB","SUMMARY","SUP","SVG","TABLE","TBODY","TD","TEXTAREA","TFOOT","TH","THEAD",
-  "TIME","TITLE","TR","TRACK","U","UL","VAR","VIDEO","WBR"];
+  var precomputeTags = ["A", "ABBR", "ADDRESS", "AREA", "ARTICLE", "ASIDE", "AUDIO", "B", "BASE", "BDI", "BDO", "BLOCKQUOTE", "BODY",
+    "BR", "BUTTON", "CANVAS", "CAPTION", "CENTER", "CITE", "CODE", "COL", "COLGROUP", "COMMAND", "DATALIST",
+    "DD", "DEL", "DETAILS", "DFN", "DIV", "DL", "DT", "EM", "EMBED", "FIELDSET", "FIGCAPTION", "FIGURE", "FONT",
+    "FOOTER", "FORM", "H1", "H2", "H3", "H4", "H5", "H6", "HEAD", "HEADER", "HGROUP", "HR", "HTML", "I", "IFRAME",
+    "IMG", "INPUT", "INS", "KBD", "KEYGEN", "LABEL", "LEGEND", "LI", "LINK", "MAP", "MARK", "MATH", "MENU", "META",
+    "METER", "NAV", "NOBR", "NOSCRIPT", "OBJECT", "OL", "OPTION", "OPTGROUP", "OUTPUT", "P", "PARAM", "PRE",
+    "PROGRESS", "Q", "RP", "RT", "RUBY", "S", "SAMP", "SCRIPT", "SECTION", "SELECT", "SMALL", "SOURCE", "SPAN",
+    "STRONG", "STYLE", "SUB", "SUMMARY", "SUP", "SVG", "TABLE", "TBODY", "TD", "TEXTAREA", "TFOOT", "TH", "THEAD",
+    "TIME", "TITLE", "TR", "TRACK", "U", "UL", "VAR", "VIDEO", "WBR"
+  ];
 
   StyleInliner = function() {
     if (document.body == null) {
@@ -92,7 +92,7 @@ var StyleInliner;
   // Return value:
   // the element with inlined styles (same object as target)
   StyleInliner.prototype.inlineStylesForSingleElement = function(element, target, excludeStyles) {
-    if (excludeStyles == null) {excludeStyles = {}}
+    if (excludeStyles == null) { excludeStyles = {} }
     var computedStyle = getComputedStyle(element);
     var display = computedStyle.getPropertyValue("display");
     var returnDisplay = element.style.display;
@@ -105,22 +105,26 @@ var StyleInliner;
 
       // exclude user-excluded styles
       if (excludeStyles[styleName] == null ||
-          excludeStyles[styleName] != true) {
-          // exclude default styles
-          if (defaultStyle[element.tagName][styleName] !== computedStyle[styleName]) {
-            target.style[styleName] = computedStyle[styleName];
-          }
+        excludeStyles[styleName] != true) {
+        // exclude default styles
+        if (defaultStyle[element.tagName][styleName] !== computedStyle[styleName]) {
+          target.style[styleName] = computedStyle[styleName];
+        }
 
-          if (styleName == "display" && defaultStyle[element.tagName]['display'] !== display) {
-            target.style['display'] = display;
-          } else if (styleName == "display") {
-            target.style['display'] = "";
-          }
+        if (styleName == "display" && defaultStyle[element.tagName]['display'] !== display) {
+          target.style['display'] = display;
+        } else if (styleName == "display") {
+          target.style['display'] = "";
         }
       }
-
-      element.style.display = returnDisplay;
     }
+
+    if (target.style.length == 0) {
+      target.removeAttribute("style");
+    }
+
+    element.style.display = returnDisplay;
+  }
 
   // inlineStyles(element, makeCopy): inlines all styles applied to elements in doc
   //
@@ -140,13 +144,13 @@ var StyleInliner;
   StyleInliner.prototype.inlineStyles = function(element, flags) {
     var me = this;
 
-    if (flags == null) {flags = {};}
-    if (flags.makeCopy == null) {flags.makeCopy = false;}
-    if (flags.useParentElement == null) {flags.useParentElement = true;}
-    if (flags.excludeTags == null) {flags.excludeTags = {};}
-    if (flags.excludeClasses == null) {flags.excludeClasses = {};}
-    if (flags.excludeIds == null) {flags.excludeIds = {};}
-    if (flags.excludeStyles == null) {flags.excludeStyles = {};}
+    if (flags == null) { flags = {}; }
+    if (flags.makeCopy == null) { flags.makeCopy = false; }
+    if (flags.useParentElement == null) { flags.useParentElement = true; }
+    if (flags.excludeTags == null) { flags.excludeTags = {}; }
+    if (flags.excludeClasses == null) { flags.excludeClasses = {}; }
+    if (flags.excludeIds == null) { flags.excludeIds = {}; }
+    if (flags.excludeStyles == null) { flags.excludeStyles = {}; }
 
     // Throw errors on parameter combinations that would otherwise lead to undefined behavior
     if (element.nodeType !== Node.ELEMENT_NODE) {
