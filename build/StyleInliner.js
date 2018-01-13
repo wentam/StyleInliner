@@ -77,8 +77,20 @@ var StyleInliner;
       return;
     }
 
+    // disable all stylesheets so we don't mark anything as default
+    var ss = document.styleSheets;
+
+    for (var i = 0; i < ss.length; i++) {
+      ss[i].disabled = true;
+    }
+
     for (var i = 0; i < precomputeTags.length; i++) {
       defaultStyle[precomputeTags[i]] = computeDefaultStyleByTagName(precomputeTags[i]);
+    }
+
+    // re-enable stylesheets
+    for (var i = 0; i < ss.length; i++) {
+      ss[i].disabled = false;
     }
   }
 
@@ -122,7 +134,6 @@ var StyleInliner;
     if (target.style.length == 0) {
       target.removeAttribute("style");
     }
-
 
     element.style.display = returnDisplay;
   }
